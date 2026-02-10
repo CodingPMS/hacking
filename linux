@@ -1,0 +1,16 @@
+#!/bin/sh
+# If arguments are provided, run them. Otherwise, display basic system info.
+if [ "$#" -gt 0 ]; then
+  exec "$@"
+else
+  echo "No command provided — showing system info:"
+  echo
+  echo "=== uname ==="
+  uname -a
+  echo
+  echo "=== date ==="
+  date
+  echo
+  echo "=== uptime ==="
+  uptime
+fi
