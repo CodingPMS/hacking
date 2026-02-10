@@ -1,7 +1,36 @@
 #!/bin/sh
-# If arguments are provided, run them. Otherwise, display basic system info.
+# linux: run given command, or show system info.
+# Special subcommand: `serve [PORT]` or `-p PORT|--port PORT` to start an HTTP server.
+
+run_server() {
+  PORT="$1"
+  [ -n "$PORT" ] || PORT=8000
+  if command -v python3 >/dev/null 2>&1; then
+    echo "Starting HTTP server on 0.0.0.0:${PORT} (using python3)"
+    exec python3 -m http.server "$PORT" --bind 0.0.0.0
+  elif command -v python >/dev/null 2>&1; then
+    echo "Starting HTTP server on 0.0.0.0:${PORT} (using python)"
+    exec python -m http.server "$PORT" --bind 0.0.0.0
+  else
+    echo "Error: python3 or python is required to run the HTTP server." >&2
+    exit 1
+  fi
+}
+
 if [ "$#" -gt 0 ]; then
-  exec "$@"
+  case "$1" in
+    serve)
+      shift
+      run_server "$1"
+      ;;
+    -p|--port)
+      shift
+      run_server "$1"
+      ;;
+    *)
+      exec "$@"
+      ;;
+  esac
 else
   echo "No command provided — showing system info:"
   echo
